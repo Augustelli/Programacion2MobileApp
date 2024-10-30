@@ -15,7 +15,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LoginView(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> Unit) {
+fun LoginView(
+    onLogin: (String, String) -> Unit,
+    onNavigateToRegister: () -> Unit,
+    loginError: String?
+) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
@@ -68,6 +72,10 @@ fun LoginView(onLogin: (String, String) -> Unit, onNavigateToRegister: () -> Uni
         if (errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(errorMessage, color = MaterialTheme.colors.error)
+        }
+        loginError?.let {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(it, color = MaterialTheme.colors.error)
         }
     }
 }

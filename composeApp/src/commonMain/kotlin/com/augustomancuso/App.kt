@@ -13,6 +13,7 @@ import com.augustomancuso.views.DeviceSaleView
 import io.ktor.client.*
 import kotlinx.coroutines.launch
 import com.augustomancuso.models.LoginDto
+import com.augustomancuso.models.RegisterDto
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -33,6 +34,8 @@ fun App() {
     var showActivate by remember { mutableStateOf(false) }
     var token by remember { mutableStateOf<String?>(null) }
     var username by remember { mutableStateOf<String?>(null) }
+    var loginError by remember { mutableStateOf<String?>(null) }
+    var registerError by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     MaterialTheme {
@@ -52,8 +55,15 @@ fun App() {
                 showRegister -> {
                     RegisterView(
                         onRegister = { RegisterDto ->
-                            showRegister = false
-                            showActivate = true
+                            coroutineScope.launch {
+                                val result = register(client, RegisterDto)
+                                if (result) {
+                                    showRegister = false
+                                    showActivate = true
+                                } else {
+                                    registerError = "Username or password is incorrect"
+                                }
+                            }
                         }
                     )
                 }
@@ -63,13 +73,17 @@ fun App() {
                             coroutineScope.launch {
                                 val result = login(client, inputUsername, password)
                                 if (result != null) {
-                                    token = result
-                                    username = result // Set username to the value of sub field
+                                    token = result.token // Set token to the value of sub field
+                                    username = result.username // Set username to the value of sub field
                                     isLoggedIn = true
+                                    loginError = null
+                                } else {
+                                    loginError = "Username or password is incorrect"
                                 }
                             }
                         },
-                        onNavigateToRegister = { showRegister = true }
+                        onNavigateToRegister = { showRegister = true },
+                        loginError = loginError
                     )
                 }
             }
@@ -80,9 +94,9 @@ fun App() {
 
 
 @OptIn(InternalAPI::class)
-suspend fun login(client: HttpClient, username: String, password: String): String? {
-    val loginDto = LoginDto(username, password)
-    val response: HttpResponse = client.post("http://localhost:8080/api/user/login") {
+suspend fun login(client: HttpClient, username: String, password: String): LoginResult? {
+    val loginDto = LoginDto(username, password, false)
+    val response: HttpResponse = client.post("http://localhost:8080/api/authenticate") {
         contentType(ContentType.Application.Json)
         body = Json.encodeToString(loginDto)
     }
@@ -96,9 +110,27 @@ suspend fun login(client: HttpClient, username: String, password: String): Strin
             val decodedString = String(decodedBytes)
             val payloadJson = Json.parseToJsonElement(decodedString).jsonObject
             val sub = payloadJson["sub"]?.jsonPrimitive?.content
-            sub
+            sub?.let { username ->
+                LoginResult(token, username)
+            }
         }
     } else {
         null
     }
+}
+
+data class LoginResult(val token: String, val username: String)
+
+
+@OptIn(InternalAPI::class)
+suspend fun register(client: HttpClient, register: RegisterDto): Boolean {
+    val response: HttpResponse = client.post("http://localhost:8080/api/register") {
+        contentType(ContentType.Application.Json)
+        body = Json.encodeToString(register)
+    }
+    if (response.status != HttpStatusCode.OK) {
+        throw Exception("Registration failed with status: ${response.status}")
+    }
+    return true;
+
 }

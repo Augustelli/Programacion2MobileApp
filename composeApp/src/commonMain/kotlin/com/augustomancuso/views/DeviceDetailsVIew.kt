@@ -26,6 +26,7 @@ fun DeviceDetailsView(
     var finalPrice by remember { mutableStateOf(device.precioBase.toDouble()) }
     var showError by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
+    var showConfirmationDialog by remember { mutableStateOf(false) }
 
     fun validatePersonalizations(): Boolean {
         return device.personalizaciones.all { it.nombre in selectedPersonalizations }
@@ -73,11 +74,22 @@ fun DeviceDetailsView(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
-                    onClick = { onPurchase(device) },
+                    onClick = { showConfirmationDialog = true },
                     enabled = validatePersonalizations(),
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)
                 ) {
                     Text("Comprar", color = Color(0xFF6200EE))
+                }
+
+                if (showConfirmationDialog) {
+                    ConfirmationDialog(
+                        device = device,
+                        onConfirm = {
+                            onPurchase(device)
+                            showConfirmationDialog = false
+                        },
+                        onCancel = { showConfirmationDialog = false }
+                    )
                 }
             }
         }

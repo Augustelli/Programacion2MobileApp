@@ -23,7 +23,7 @@ fun RegisterView(onRegister: (RegisterDto) -> Unit) {
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var nombres by remember { mutableStateOf("") }
-    var descripcion by remember { mutableStateOf("") }
+    var apellido by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
     Column(
@@ -74,15 +74,15 @@ fun RegisterView(onRegister: (RegisterDto) -> Unit) {
         OutlinedTextField(
             value = nombres,
             onValueChange = { nombres = it },
-            label = { Text("Nombres") },
+            label = { Text("Nombre") },
             leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
-            value = descripcion,
-            onValueChange = { descripcion = it },
-            label = { Text("Descripción") },
+            value = apellido,
+            onValueChange = { apellido = it },
+            label = { Text("Apellido") },
             leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
@@ -91,7 +91,7 @@ fun RegisterView(onRegister: (RegisterDto) -> Unit) {
             onClick = {
                 if (login.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
                     if (password == confirmPassword) {
-                        onRegister(RegisterDto(login, email, password, "es", descripcion, nombres, false))
+                        onRegister(RegisterDto(login, email, password, "es", apellido, nombres, false))
                     } else {
                         errorMessage = "Las contraseñas no coinciden"
                     }

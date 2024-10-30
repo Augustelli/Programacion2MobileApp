@@ -94,7 +94,7 @@ fun DeviceItem(device: DispositivosDto, onSelect: (DispositivosDto) -> Unit) {
 
 suspend fun fetchDevicesJson(client: HttpClient, token: String): String? {
     val response: HttpResponse = client.get("http://localhost:8080/api/device") {
-        //header(HttpHeaders.Authorization, "Bearer $token")
+        header(HttpHeaders.Authorization, "Bearer $token")
     }
     println("Response: ${response.status}")
     return if (response.status == HttpStatusCode.OK) {
