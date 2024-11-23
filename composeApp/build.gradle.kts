@@ -18,6 +18,7 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.androidx.core.i18n)
 }
 
 kotlin {
@@ -67,6 +68,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ktor.client.core)
             implementation("io.ktor:ktor-client-okhttp:2.0.0")
+
 
 
         }

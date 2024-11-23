@@ -9,5 +9,5 @@ data class OpcionDto (
     var codigo: String,
     var nombre: String,
     var descripcion: String,
-    var precioAdicional: Float
+    var precioAdicional: Float,
 )

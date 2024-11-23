@@ -111,6 +111,7 @@ suspend fun login(client: HttpClient, username: String, password: String): Login
             val payloadJson = Json.parseToJsonElement(decodedString).jsonObject
             val sub = payloadJson["sub"]?.jsonPrimitive?.content
             sub?.let { username ->
+                TokenStorage.setToken(token)
                 LoginResult(token, username)
             }
         }
@@ -133,4 +134,20 @@ suspend fun register(client: HttpClient, register: RegisterDto): Boolean {
     }
     return true;
 
+}
+
+object TokenStorage{
+    private var token: String? = null
+
+    fun getToken(): String? {
+        return token
+    }
+
+    fun setToken(newToken: String) {
+        token = newToken
+    }
+
+    fun clearToken() {
+        token = null
+    }
 }

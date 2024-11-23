@@ -68,7 +68,7 @@ fun DeviceDetailsView(
                 backgroundColor = Color(0xFF6200EE)
             ) {
                 Text(
-                    text = "Precio final: $finalPrice ${device.moneda}",
+                    text = "Precio final: ${finalPrice} ${device.moneda}",
                     color = Color.White,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -84,11 +84,16 @@ fun DeviceDetailsView(
                 if (showConfirmationDialog) {
                     ConfirmationDialog(
                         device = device,
+                        selectedAdditionals = selectedAdditionals,
+                        selectedPersonalizations = selectedPersonalizations,
+                        finalPrice = finalPrice,
                         onConfirm = {
                             onPurchase(device)
                             showConfirmationDialog = false
                         },
-                        onCancel = { showConfirmationDialog = false }
+                        onCancel = { showConfirmationDialog = false },
+                        onNavigateHome = onGoBack
+
                     )
                 }
             }

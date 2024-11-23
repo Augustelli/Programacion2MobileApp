@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class CaracteristicaDto(
     var id: Int,
     var nombre: String,
-    var descripcion: String
+    var descripcion: String,
 )
