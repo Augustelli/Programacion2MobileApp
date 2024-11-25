@@ -10,5 +10,15 @@ data class PersonalizacionDto(
     var nombre: String,
     var descripcion: String,
     var opciones: List<OpcionDto>,
+    //var opcion: List<OpcionDto>,
 
-    )
+)
+
+@Serializable
+data class PersonalizacionDetalleDto(
+    var id: Int,
+    var nombre: String,
+    var descripcion: String,
+    var opcion: OpcionDto
+
+)

@@ -120,7 +120,7 @@ suspend fun purchaseDevice(client: HttpClient, device: DispositivosDto, selected
 fun transformDispositivoDtoToInformSellModel(device: DispositivosDto, selectedPersonalizations: Map<String, String>, selectedAdditionals: Set<String>, finalPrice: Double): InformSellModel {
     val informSellModel = InformSellModel()
     informSellModel.idDispositivo = device.id
-    informSellModel.precio = finalPrice.toFloat()
+    informSellModel.precioFinal = finalPrice.toFloat()
     device.personalizaciones.forEach { personalization ->
         selectedPersonalizations[personalization.nombre]?.let { selectedOption ->
             val option = personalization.opciones.find { it.nombre == selectedOption.split(" - ")[0] }

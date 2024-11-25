@@ -10,5 +10,5 @@ data class AdicionalDto(
     var nombre: String,
     var descripcion: String,
     var precio: Float,
-    var precioGratis: Float,
+    var precioGratis: Float = 0f,
 )

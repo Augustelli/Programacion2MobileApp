@@ -10,7 +10,7 @@ class InformSellModel {
     var idDispositivo : Int = 0;
     var personalizaciones: List<SellItemModel> = listOf();
     var adicionales: List<SellItemModel> = listOf();
-    var precio: Float = 0.0f;
+    var precioFinal: Float = 0.0f;
     var fechaVenta: String = "";
 }
 

@@ -1,8 +1,10 @@
 package com.augustomancuso.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class VentaDto (
     var idVenta : Int,
-    var id: Number,
     var codigo: String,
     var nombre: String,
     var descripcion: String,

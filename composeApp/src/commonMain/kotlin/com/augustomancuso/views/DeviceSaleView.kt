@@ -11,21 +11,31 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.augustomancuso.models.DispositivosDto
+import com.augustomancuso.models.InformSellModel
+import com.augustomancuso.models.VentaDetalleDto
+import com.augustomancuso.models.VentaDto
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
-/*
-import kotlin.system.exitProcess
-*/
+
 
 @Composable
-fun DeviceSaleView(client: HttpClient, token: String, userName: String, onPurchase: (DispositivosDto) -> Unit) {
+fun DeviceSaleView(
+    client: HttpClient,
+    token: String,
+    userName: String,
+    onPurchase: (DispositivosDto) -> Unit
+) {
     var devices by remember { mutableStateOf<List<DispositivosDto>>(emptyList()) }
     var jsonResponse by remember { mutableStateOf<String?>(null) }
     var selectedDevice by remember { mutableStateOf<DispositivosDto?>(null) }
+    var showPurchasedDevices by remember { mutableStateOf(false) }
+    var purchasedDevices by remember { mutableStateOf<List<VentaDto>>(emptyList()) }
+    var selectedSale by remember { mutableStateOf<VentaDto?>(null) }
+    var selectedSaleDetail by remember { mutableStateOf<VentaDetalleDto?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(token) {
@@ -43,34 +53,168 @@ fun DeviceSaleView(client: HttpClient, token: String, userName: String, onPurcha
                 title = { Text("Bienvenido, $userName") },
                 backgroundColor = Color(0xFF6200EE),
                 contentColor = Color.White,
-/*                actions = {
-                    Button(onClick = { exitProcess(0) }) {
-                        Text("Quit")
+                actions = {
+                    Button(onClick = {
+                        coroutineScope.launch {
+                            purchasedDevices = fetchPurchasedDevices(client, token)
+                            showPurchasedDevices = true
+                        }
+                    }) {
+                        Text("Ver Compras")
                     }
-                }*/
+                }
             )
         }
     ) {
-        if (selectedDevice != null) {
-            DeviceDetailsView(selectedDevice!!, onPurchase) {
-                selectedDevice = null
+        when {
+            selectedDevice != null -> {
+                DeviceDetailsView(selectedDevice!!, onPurchase) {
+                    selectedDevice = null
+                }
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .background(Color(0xFFF5F5F5))
-            ) {
-                LazyColumn {
-                    items(devices) { device ->
-                        DeviceItem(device) {
-                            selectedDevice = it
+
+            showPurchasedDevices -> {
+                PurchasedDevicesView(purchasedDevices) { sale ->
+                    coroutineScope.launch {
+                        val saleDetails = fetchSaleDetails(client, sale.idVenta, token)
+                        selectedSaleDetail = saleDetails
+                    }
+                }
+            }
+
+            selectedSaleDetail != null -> {
+                SaleDetailsView(selectedSaleDetail!!) {
+                    selectedSaleDetail = null
+                }
+            }
+
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .background(Color(0xFFF5F5F5))
+                ) {
+                    LazyColumn {
+                        items(devices) { device ->
+                            DeviceItem(device) {
+                                selectedDevice = it
+                            }
                         }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun PurchasedDevicesView(purchasedDevices: List<VentaDto>, onSelect: (VentaDto) -> Unit) {
+    LazyColumn {
+        items(purchasedDevices) { sale ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                elevation = 8.dp,
+                backgroundColor = Color(0xFFF5F5F5)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "Venta: ${sale.nombre}",
+                        style = MaterialTheme.typography.h6,
+                        color = Color(0xFF6200EE)
+                    )
+                    Text(
+                        "Descripcion: ${sale.descripcion}",
+                        style = MaterialTheme.typography.body1,
+                        color = Color.Gray
+                    )
+                    Text(
+                        "Precio: ${sale.precio}",
+                        style = MaterialTheme.typography.body2,
+                        color = Color.Black
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { onSelect(sale) },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE)),
+                    ) {
+                        Text("Ver Detalles", color = Color.White)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun SaleDetailsView(sale: VentaDetalleDto, onBack: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(Color(0xFFF5F5F5))
+    ) {
+        Text(
+            "${sale.nombre}",
+            style = MaterialTheme.typography.h6,
+            color = Color(0xFF6200EE)
+        )
+        Text("Descripción: ${sale.descripcion}", color = Color.Black)
+        Text("Precio Base: ${sale.precioBase}", color = Color.Black)
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Características:", style = MaterialTheme.typography.h6, color = Color(0xFF6200EE))
+        sale.catacteristicas.forEach { item ->
+            Text("${item.nombre} ${item.descripcion}", color = Color.Black)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Personalizaciones:", style = MaterialTheme.typography.h6, color = Color(0xFF6200EE))
+        sale.personalizaciones.forEach { item ->
+            Text("Tipo: ${item.nombre}", color = Color.Black)
+            Text("Nombre: ${item.opcion.nombre}", color = Color.Black)
+            Text("Descripción: ${item.opcion.descripcion}", color = Color.Black)
+            Text("Precio adicional: ${item.opcion.precioAdicional}", color = Color.Black)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text("Adicionales:", style = MaterialTheme.typography.h6, color = Color(0xFF6200EE))
+        sale.adicionales.forEach { item ->
+            Text("Tipo: ${item.nombre}", color = Color.Black)
+            Text("Descripción: ${item.descripcion}", color = Color.Black)
+            Text("Precio: ${item.precio}", color = Color.Black)
+
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = onBack) {
+            Text("Volver")
+        }
+    }
+}
+
+suspend fun fetchPurchasedDevices(client: HttpClient, token: String): List<VentaDto> {
+    val response: HttpResponse = client.get("http://localhost:8080/api/device/sells") {
+        header(HttpHeaders.Authorization, "Bearer $token")
+
+    }
+    println("Response: ${response.status}")
+    return if (response.status == HttpStatusCode.OK) {
+        Json.decodeFromString(response.bodyAsText())
+
+    } else {
+        emptyList()
+    }
+}
+
+suspend fun fetchSaleDetails(client: HttpClient, saleId: Int, token: String): VentaDetalleDto? {
+    val response: HttpResponse = client.get("http://localhost:8080/api/device/sells/$saleId") {
+        header(HttpHeaders.Authorization, "Bearer $token")
+    }
+    return if (response.status == HttpStatusCode.OK) {
+        println("Response: ${response.status}" + response.bodyAsText())
+        Json.decodeFromString(response.bodyAsText())
+    } else {
+        null
     }
 }
 
@@ -97,6 +241,7 @@ suspend fun fetchDevicesJson(client: HttpClient, token: String): String? {
         header(HttpHeaders.Authorization, "Bearer $token")
     }
     println("Response: ${response.status}")
+    println("RESPUESTA DISPOSITIVOS: ${response.bodyAsText()}")
     return if (response.status == HttpStatusCode.OK) {
         response.bodyAsText()
     } else {
