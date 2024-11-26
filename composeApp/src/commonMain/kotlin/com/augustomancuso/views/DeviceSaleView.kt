@@ -76,7 +76,7 @@ fun DeviceSaleView(
             }
 
             showPurchasedDevices -> {
-                PurchasedDevicesView(purchasedDevices) { sale ->
+                PurchasedDevicesView(purchasedDevices, onBack = { showPurchasedDevices = false }) { sale ->
                     coroutineScope.launch {
                         val saleDetails = fetchSaleDetails(client, sale.idVenta, token)
                         selectedSaleDetail = saleDetails
@@ -106,6 +106,51 @@ fun DeviceSaleView(
         if (showModal && selectedSaleDetail != null) {
             SaleDetailsModal(sale = selectedSaleDetail!!) {
                 showModal = false
+            }
+        }
+    }
+}
+
+@Composable
+fun PurchasedDevicesView(purchasedDevices: List<VentaDto>, onBack: () -> Unit, onSelect: (VentaDto) -> Unit) {
+    Column {
+        Button(onClick = onBack) {
+            Text("Volver")
+        }
+        LazyColumn {
+            items(purchasedDevices) { sale ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    elevation = 8.dp,
+                    backgroundColor = Color(0xFFF5F5F5)
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            "Venta: ${sale.nombre}",
+                            style = MaterialTheme.typography.h6,
+                            color = Color(0xFF6200EE)
+                        )
+                        Text(
+                            "Descripcion: ${sale.descripcion}",
+                            style = MaterialTheme.typography.body1,
+                            color = Color.Gray
+                        )
+                        Text(
+                            "Precio: ${sale.precio}",
+                            style = MaterialTheme.typography.body2,
+                            color = Color.Black
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(
+                            onClick = { onSelect(sale) },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE)),
+                        ) {
+                            Text("Ver Detalles", color = Color.White)
+                        }
+                    }
+                }
             }
         }
     }
@@ -151,45 +196,7 @@ fun SaleDetailsModal(sale: VentaDetalleDto, onDismiss: () -> Unit) {
     )
 }
 
-@Composable
-fun PurchasedDevicesView(purchasedDevices: List<VentaDto>, onSelect: (VentaDto) -> Unit) {
-    LazyColumn {
-        items(purchasedDevices) { sale ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                elevation = 8.dp,
-                backgroundColor = Color(0xFFF5F5F5)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        "Venta: ${sale.nombre}",
-                        style = MaterialTheme.typography.h6,
-                        color = Color(0xFF6200EE)
-                    )
-                    Text(
-                        "Descripcion: ${sale.descripcion}",
-                        style = MaterialTheme.typography.body1,
-                        color = Color.Gray
-                    )
-                    Text(
-                        "Precio: ${sale.precio}",
-                        style = MaterialTheme.typography.body2,
-                        color = Color.Black
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { onSelect(sale) },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6200EE)),
-                    ) {
-                        Text("Ver Detalles", color = Color.White)
-                    }
-                }
-            }
-        }
-    }
-}
+
 
 
 @Composable
