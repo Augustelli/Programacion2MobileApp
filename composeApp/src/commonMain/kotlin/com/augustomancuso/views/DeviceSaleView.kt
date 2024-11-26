@@ -33,9 +33,11 @@ fun DeviceSaleView(
     var jsonResponse by remember { mutableStateOf<String?>(null) }
     var selectedDevice by remember { mutableStateOf<DispositivosDto?>(null) }
     var showPurchasedDevices by remember { mutableStateOf(false) }
+    var showPurchasedDevicesDetail by remember { mutableStateOf(false) }
     var purchasedDevices by remember { mutableStateOf<List<VentaDto>>(emptyList()) }
     var selectedSale by remember { mutableStateOf<VentaDto?>(null) }
     var selectedSaleDetail by remember { mutableStateOf<VentaDetalleDto?>(null) }
+    var showModal by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(token) {
@@ -78,13 +80,8 @@ fun DeviceSaleView(
                     coroutineScope.launch {
                         val saleDetails = fetchSaleDetails(client, sale.idVenta, token)
                         selectedSaleDetail = saleDetails
+                        showModal = true
                     }
-                }
-            }
-
-            selectedSaleDetail != null -> {
-                SaleDetailsView(selectedSaleDetail!!) {
-                    selectedSaleDetail = null
                 }
             }
 
@@ -105,7 +102,53 @@ fun DeviceSaleView(
                 }
             }
         }
+
+        if (showModal && selectedSaleDetail != null) {
+            SaleDetailsModal(sale = selectedSaleDetail!!) {
+                showModal = false
+            }
+        }
     }
+}
+
+@Composable
+fun SaleDetailsModal(sale: VentaDetalleDto, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Detalles de la Venta") },
+        text = {
+            Column {
+                Text("Nombre: ${sale.nombre}")
+                Text("Descripción: ${sale.descripcion}")
+                Text("Precio Base: ${sale.precioBase}")
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Características:")
+                sale.catacteristicas.forEach { item ->
+                    Text("${item.nombre}: ${item.descripcion}")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Personalizaciones:")
+                sale.personalizaciones.forEach { item ->
+                    Text("Tipo: ${item.nombre}")
+                    Text("Nombre: ${item.opcion.nombre}")
+                    Text("Descripción: ${item.opcion.descripcion}")
+                    Text("Precio adicional: ${item.opcion.precioAdicional}")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("Adicionales:")
+                sale.adicionales.forEach { item ->
+                    Text("Tipo: ${item.nombre}")
+                    Text("Descripción: ${item.descripcion}")
+                    Text("Precio: ${item.precio}")
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("Cerrar")
+            }
+        }
+    )
 }
 
 @Composable
