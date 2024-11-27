@@ -137,7 +137,7 @@ fun transformDispositivoDtoToInformSellModel(device: DispositivosDto, selectedPe
         if (selectedAdditionals.contains("${additional.id} - ${additional.descripcion}")) {
             val sellItemModel = SellItemModel()
             sellItemModel.id = additional.id
-            sellItemModel.precio = additional.precio
+            sellItemModel.precio = additional.precio ?: 0f
             informSellModel.adicionales += sellItemModel
         }
     }

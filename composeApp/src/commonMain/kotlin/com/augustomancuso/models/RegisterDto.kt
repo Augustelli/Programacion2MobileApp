@@ -1,12 +1,13 @@
 package com.augustomancuso.models
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class RegisterDto(
     var login: String,
     var email: String,
     var password: String,
     var langKey: String = "es",
-    var descripcion: String,
-    var nombres: String,
-    var rememberMe: Boolean = false
-
+    var firstName: String,
+    var lastName: String
 )

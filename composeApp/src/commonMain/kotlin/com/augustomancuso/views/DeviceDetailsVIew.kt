@@ -49,12 +49,12 @@ fun DeviceDetailsView(
             val id = idWithDescription.split(" - ")[0]
             val additional = device.adicionales.find { it.id.toString() == id }
             additional?.let {
-                if (price + it.precio > it.precioGratis && it.precioGratis != -1f) {
+                if (price + it.precio!! > it.precioGratis!! && it.precioGratis != -1f) {
                     newRemainingAmounts[it.id.toString()] = 0f
                 } else {
-                    price += it.precio
+                    price += it.precio!!
                     newRemainingAmounts[it.id.toString()] =
-                        (it.precioGratis - (price + it.precio)).toFloat()
+                        (it.precioGratis!! - (price + it.precio!!)).toFloat()
                 }
             }
         }

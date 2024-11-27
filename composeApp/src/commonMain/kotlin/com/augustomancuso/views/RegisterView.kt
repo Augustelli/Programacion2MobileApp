@@ -91,7 +91,7 @@ fun RegisterView(onRegister: (RegisterDto) -> Unit) {
             onClick = {
                 if (login.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
                     if (password == confirmPassword) {
-                        onRegister(RegisterDto(login, email, password, "es", apellido, nombres, false))
+                        onRegister(RegisterDto(login, email, password, "es", nombres, apellido))
                     } else {
                         errorMessage = "Las contraseñas no coinciden"
                     }

@@ -11,8 +11,8 @@ data class VentaDetalleDto(
     var descripcion: String,
     var precioBase: Float,
     var moneda: String,
-    //var caracteristicas: List<CaracteristicaDto>,
-    var catacteristicas: List<CaracteristicaDto>,
+    var caracteristicas: List<CaracteristicaDto>,
+    //var catacteristicas: List<CaracteristicaDto>,
     var personalizaciones: List<PersonalizacionDetalleDto>,
     var adicionales: List<AdicionalDto>,
 )

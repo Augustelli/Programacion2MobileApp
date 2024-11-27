@@ -162,29 +162,39 @@ fun SaleDetailsModal(sale: VentaDetalleDto, onDismiss: () -> Unit) {
         onDismissRequest = onDismiss,
         title = { Text(text = "Detalles de la Venta") },
         text = {
-            Column {
-                Text("Nombre: ${sale.nombre}")
-                Text("Descripción: ${sale.descripcion}")
-                Text("Precio Base: ${sale.precioBase}")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Características:")
-                sale.catacteristicas.forEach { item ->
-                    Text("${item.nombre}: ${item.descripcion}")
+            LazyColumn(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                item {
+                    Text("Nombre: ${sale.nombre}", style = MaterialTheme.typography.h6)
+                    Text("Descripción: ${sale.descripcion}", style = MaterialTheme.typography.body1)
+                    Text("Precio Base: ${sale.precioBase}", style = MaterialTheme.typography.body1)
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Personalizaciones:")
-                sale.personalizaciones.forEach { item ->
-                    Text("Tipo: ${item.nombre}")
-                    Text("Nombre: ${item.opcion.nombre}")
-                    Text("Descripción: ${item.opcion.descripcion}")
-                    Text("Precio adicional: ${item.opcion.precioAdicional}")
+                item {
+                    Text("Características:", style = MaterialTheme.typography.h6)
+                    sale.caracteristicas.forEach { item ->
+                        Text("${item.nombre}: ${item.descripcion}", style = MaterialTheme.typography.body2)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Adicionales:")
-                sale.adicionales.forEach { item ->
-                    Text("Tipo: ${item.nombre}")
-                    Text("Descripción: ${item.descripcion}")
-                    Text("Precio: ${item.precio}")
+                item {
+                    Text("Personalizaciones:", style = MaterialTheme.typography.h6)
+                    sale.personalizaciones.forEach { item ->
+                        Text("Tipo: ${item.nombre}", style = MaterialTheme.typography.body2)
+                        Text("Nombre: ${item.opcion.nombre}", style = MaterialTheme.typography.body2)
+                        Text("Descripción: ${item.opcion.descripcion}", style = MaterialTheme.typography.body2)
+                        Text("Precio adicional: ${item.opcion.precioAdicional}", style = MaterialTheme.typography.body2)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                item {
+                    Text("Adicionales:", style = MaterialTheme.typography.h6)
+                    sale.adicionales.forEach { item ->
+                        Text("Tipo: ${item.nombre}", style = MaterialTheme.typography.body2)
+                        Text("Descripción: ${item.descripcion}", style = MaterialTheme.typography.body2)
+                        Text("Precio: ${item.precio}", style = MaterialTheme.typography.body2)
+                    }
                 }
             }
         },
@@ -216,7 +226,7 @@ fun SaleDetailsView(sale: VentaDetalleDto, onBack: () -> Unit) {
         Text("Precio Base: ${sale.precioBase}", color = Color.Black)
         Spacer(modifier = Modifier.height(8.dp))
         Text("Características:", style = MaterialTheme.typography.h6, color = Color(0xFF6200EE))
-        sale.catacteristicas.forEach { item ->
+        sale.caracteristicas.forEach { item ->
             Text("${item.nombre} ${item.descripcion}", color = Color.Black)
         }
         Spacer(modifier = Modifier.height(8.dp))

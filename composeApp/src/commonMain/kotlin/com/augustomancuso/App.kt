@@ -3,7 +3,10 @@ package com.augustomancuso
 import com.augustomancuso.views.LoginView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +35,7 @@ fun App() {
     var isLoggedIn by remember { mutableStateOf(false) }
     var showRegister by remember { mutableStateOf(false) }
     var showActivate by remember { mutableStateOf(false) }
+    var showSuccessModal by remember { mutableStateOf(false) }
     var token by remember { mutableStateOf<String?>(null) }
     var username by remember { mutableStateOf<String?>(null) }
     var loginError by remember { mutableStateOf<String?>(null) }
@@ -60,8 +64,9 @@ fun App() {
                                 if (result) {
                                     showRegister = false
                                     showActivate = true
+                                    showSuccessModal = true
                                 } else {
-                                    registerError = "Username or password is incorrect"
+                                    registerError = "Credenciales inválidas"
                                 }
                             }
                         }
@@ -88,7 +93,25 @@ fun App() {
                 }
             }
         }
+
+        if (showSuccessModal) {
+            SuccessModal(onDismiss = { showSuccessModal = false })
+        }
     }
+}
+
+@Composable
+fun SuccessModal(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(text = "Registro Exitoso") },
+        text = { Text("El usuario ha sido creado exitosamente.") },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("Cerrar")
+            }
+        }
+    )
 }
 
 
@@ -129,7 +152,7 @@ suspend fun register(client: HttpClient, register: RegisterDto): Boolean {
         contentType(ContentType.Application.Json)
         body = Json.encodeToString(register)
     }
-    if (response.status != HttpStatusCode.OK) {
+    if (response.status != HttpStatusCode.Created) {
         throw Exception("Registration failed with status: ${response.status}")
     }
     return true;
