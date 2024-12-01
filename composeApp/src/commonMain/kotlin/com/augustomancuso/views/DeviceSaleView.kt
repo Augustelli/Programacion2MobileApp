@@ -33,9 +33,7 @@ fun DeviceSaleView(
     var jsonResponse by remember { mutableStateOf<String?>(null) }
     var selectedDevice by remember { mutableStateOf<DispositivosDto?>(null) }
     var showPurchasedDevices by remember { mutableStateOf(false) }
-    var showPurchasedDevicesDetail by remember { mutableStateOf(false) }
     var purchasedDevices by remember { mutableStateOf<List<VentaDto>>(emptyList()) }
-    var selectedSale by remember { mutableStateOf<VentaDto?>(null) }
     var selectedSaleDetail by remember { mutableStateOf<VentaDetalleDto?>(null) }
     var showModal by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -255,7 +253,6 @@ fun SaleDetailsView(sale: VentaDetalleDto, onBack: () -> Unit) {
 suspend fun fetchPurchasedDevices(client: HttpClient, token: String): List<VentaDto> {
     val response: HttpResponse = client.get("http://localhost:8080/api/device/sells") {
         header(HttpHeaders.Authorization, "Bearer $token")
-
     }
     println("Response: ${response.status}")
     return if (response.status == HttpStatusCode.OK) {
@@ -300,8 +297,6 @@ suspend fun fetchDevicesJson(client: HttpClient, token: String): String? {
     val response: HttpResponse = client.get("http://localhost:8080/api/device") {
         header(HttpHeaders.Authorization, "Bearer $token")
     }
-    println("Response: ${response.status}")
-    println("RESPUESTA DISPOSITIVOS: ${response.bodyAsText()}")
     return if (response.status == HttpStatusCode.OK) {
         response.bodyAsText()
     } else {

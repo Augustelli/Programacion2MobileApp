@@ -28,6 +28,9 @@ fun DeviceDetailsView(
     val scrollState = rememberScrollState()
     var showConfirmationDialog by remember { mutableStateOf(false) }
 
+    val coroutineScope = rememberCoroutineScope()
+
+
     fun validatePersonalizations(): Boolean {
         return device.personalizaciones.all { it.nombre in selectedPersonalizations }
     }
@@ -83,6 +86,7 @@ fun DeviceDetailsView(
 
                 if (showConfirmationDialog) {
                     ConfirmationDialog(
+                        couroutine = coroutineScope,
                         device = device,
                         selectedAdditionals = selectedAdditionals,
                         selectedPersonalizations = selectedPersonalizations,
